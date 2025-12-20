@@ -1,5 +1,5 @@
 package cmd
 
-func hi () string {
+func Hi () string {
 	return "hi";
 }

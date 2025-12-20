@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/MelodicTyper/wabi/cmd"
 )
 
 func main () {
-	cmd.hi();
+	fmt.Printf(cmd.Hi());
 }
