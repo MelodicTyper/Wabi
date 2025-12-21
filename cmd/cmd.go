@@ -37,6 +37,12 @@ func ProcessCmd (cmd string) {
 		syscalls.TurnLEDOn()
 	case "off":
 		syscalls.TurnLEDOff()
+	case "fs-init":
+		syscalls.InitFS()
+	case "fs-test-file-create":
+		syscalls.WriteTestFile()
+	case "fs-test-file-read":
+		syscalls.ReadTestFile()
 		
 	default:
 		println("Unknown command: ", cmd)
