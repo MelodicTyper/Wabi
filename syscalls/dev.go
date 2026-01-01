@@ -92,7 +92,7 @@ func ReadTestFile () {
 		return
 	}
 	defer f.Close();
-	buf := make([]byte, 128)
+	buf := make([]byte, 16)
 	for {
 		n, err := f.Read(buf)
 		if err != nil {
@@ -101,6 +101,6 @@ func ReadTestFile () {
 			}
 			println("Error Reading File")
 		}
-		println(string(buf[:n]))
+		machine.Serial.Write(buf[:n])
 	}
 }
