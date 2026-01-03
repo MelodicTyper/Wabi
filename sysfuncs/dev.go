@@ -1,4 +1,4 @@
-package syscalls
+package sysfuncs
 
 // Developement syscalls, not meant to be anything close to the final version
 

@@ -24,6 +24,8 @@ My experience with Linux is a major basis for how I want to design everything.
 
 Found this on the Plan 9 wikipedia page, and it talked about having virtual file systems for complex things that are usually interacted with through syscalls. This allows for applications to use simple file interactions to talk to complex systems. Since it's virtual, wouldn't pressure the flash storage. Might make implementing file syscalls weird since you have to search both vfs and the actual fs.
 
+For this reason, that's why I wrap everything in the file sysfuncs.
+
 ### Shells should pass more than strings
 
 Maybe something closer to nushell than bash. Multiple return types. Somehow blend the simplicity and effectiveness of bash with the power of a scripting language. 

@@ -1,6 +1,6 @@
 # WabiOS
 
-Toy personal OS for the Rasperry Pi Pico 2 microcontroller. 
+Toy personal "OS" for the Rasperry Pi Pico 2 microcontroller. 
 
 ## AI Usage
 
