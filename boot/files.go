@@ -10,7 +10,7 @@ var (
 	fs = littlefs.New(blockdev)
 )
 
-func InitFS () littlefs.LFS {
+func InitFS () *littlefs.LFS {
 	fs.Configure(&littlefs.Config{
 		CacheSize:     512,
 		LookaheadSize: 512,
@@ -34,5 +34,5 @@ func InitFS () littlefs.LFS {
 	}
 	println("FS Initialization compelte")
 	//println(fs.Size())
-	
+	return fs
 }

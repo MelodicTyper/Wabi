@@ -4,7 +4,6 @@ go 1.22.5
 
 require (
 	github.com/soypat/cyw43439 v0.0.0-20251110224555-0a1d121ea3af
-	tinygo.org/x/drivers v0.31.0
 	tinygo.org/x/tinyfs v0.5.0
 )
 

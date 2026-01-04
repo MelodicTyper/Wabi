@@ -10,7 +10,10 @@ import (
 func main () {
 	
 	
-	fs := boot.InitFS()
+	littlefs := boot.InitFS()
+	fs := &sysfuncs.Filesystem{Internal: littlefs}
+	
+	//cyw43439 := boot.InitCYW43439()
 	
 	
 	
@@ -22,6 +25,8 @@ func main () {
 	
 	sysfuncs.TurnLEDOn()
 	
+	print(fs.Size())
+	cmd.SetFS(fs)
 	for {
 		stdin = cmd.HandleCmdPrompt(stdin);
 		time.Sleep(20 * time.Millisecond)

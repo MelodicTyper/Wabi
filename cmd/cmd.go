@@ -6,7 +6,8 @@ import (
 	"machine"
 	"runtime"
 	//"bytes"
-	"github.com/MelodicTyper/wabi/syscalls"
+	"github.com/MelodicTyper/wabi/sysfuncs"
+	"strings"
 )
 
 func HandleCmdPrompt (inputBuffer []byte) []byte {
@@ -34,11 +35,19 @@ func HandleCmdPrompt (inputBuffer []byte) []byte {
 
 var m runtime.MemStats
 
-func ProcessCmd (cmd []byte) {
-	
+var fs *sysfuncs.Filesystem
 
+func SetFS (f *sysfuncs.Filesystem) {
+	fs = f;
+}
+
+func ProcessCmd (cmdBuf []byte) {
 	
-	switch string(cmd) {
+	cmd := string(cmdBuf)
+	cmdFirst := strings.SplitAfterN(cmd, " ", 2)[0]
+	cmdFirst = strings.Trim(cmdFirst, " ")
+	print(cmdFirst)
+	switch cmdFirst {
 	case "hi":
 		println("Hello!")
 		
@@ -61,17 +70,26 @@ func ProcessCmd (cmd []byte) {
 		
 	
 	case "on":
-		syscalls.TurnLEDOn()
+		sysfuncs.TurnLEDOn()
 	case "off":
-		syscalls.TurnLEDOff()
+		sysfuncs.TurnLEDOff()
 	case "fs-init":
-		syscalls.InitFS()
+		sysfuncs.InitFS()
 	case "fs-test-file-create":
-		syscalls.WriteTestFile()
+		sysfuncs.WriteTestFile()
 	case "fs-test-file-read":	
-		syscalls.ReadTestFile()
+		sysfuncs.ReadTestFile()
+		
+	case "fs-write-file":
+		// fs-write-file [filePath] ...bufToWrite
+		s := strings.SplitAfterN(cmd, " ", 3)
+		f := fs.OpenFile(s[1])
+		defer f.Close()
+		f.Write([]byte(s[2]))
+		print("Successfully written file ", s[1], " with contents ", s[2])
+		
 	default:
-		println("Unknown command: ")
+		println("Unknown command: ", cmdFirst)
 	}
 	
 }
