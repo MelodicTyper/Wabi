@@ -2,15 +2,14 @@ package sysfuncs
 
 import (
 	//"machine"
-	"tinygo.org/x/tinyfs/littlefs"
-	"tinygo.org/x/tinyfs"
+
 	"os"
+
+	"tinygo.org/x/tinyfs"
+	"tinygo.org/x/tinyfs/littlefs"
 )
 
 // this file is mostly a wrapper of the tinyfs and littlefs packages currently
-
-
-
 
 type Filesystem struct {
 	Internal *littlefs.LFS
@@ -18,16 +17,16 @@ type Filesystem struct {
 
 func (fs *Filesystem) Open(filePath string) File {
 	f, err := fs.Internal.Open(filePath)
-	if (err != nil) {
-		panic("Failed to open file")
+	if err != nil {
+		panic("Failed to open file: " + filePath + " " + err.Error())
 	}
 	file := File{internal: f, isVirt: false}
 	return file
 }
 
 func (fs *Filesystem) OpenFile(filePath string) File {
-	f, err := fs.Internal.OpenFile(filePath,  os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
-	if (err != nil) {
+	f, err := fs.Internal.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC)
+	if err != nil {
 		panic("Failed to open file")
 	}
 	file := File{internal: f, isVirt: false}
@@ -52,11 +51,9 @@ func (fs *Filesystem) Size() (n int, err error) {
 	return n, err
 }
 
-
-
 type File struct {
 	internal tinyfs.File
-	isVirt bool
+	isVirt   bool
 }
 
 func (f *File) Read(buf []byte) (n int, err error) {
@@ -66,6 +63,10 @@ func (f *File) Read(buf []byte) (n int, err error) {
 
 func (f *File) Close() error {
 	err := f.internal.Close()
+	if err != nil {
+		print(err.Error())
+
+	}
 	return err
 }
 

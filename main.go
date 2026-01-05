@@ -17,10 +17,10 @@ func main () {
 	
 	
 	
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	println("System init.")
 	print("\r\n> ") // Print prompt
-	stdin := make([]byte, 0, 64)
+	stdin := make([]byte, 0, 128)
 	sysfuncs.InitLED()
 	
 	sysfuncs.TurnLEDOn()
