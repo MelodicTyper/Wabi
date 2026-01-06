@@ -5,6 +5,7 @@ import (
 	//"fmt"
 	//"bytes"
 	"machine"
+	"os"
 	"runtime"
 
 	//"bytes"
@@ -85,8 +86,8 @@ func ProcessCmd(cmdBuf []byte) {
 	case "fs-write-file":
 		// fs-write-file [filePath] ...bufToWrite
 		s := strings.SplitAfterN(cmd, " ", 3)
-		f := fs.OpenFile(s[1])
-		defer f.Close()
+		f := fs.OpenFile(strings.Trim("/" + s[1], " "))
+		//defer f.Close()
 
 		buf := make([]byte, 64)
 		copy(buf, s[2])
@@ -95,10 +96,17 @@ func ProcessCmd(cmdBuf []byte) {
 			print(err)
 		}
 		print("Successfully written file ", s[1], " with contents ", s[2])
-
+		erro := f.Close()
+		if erro != nil {
+			panic("DIDN'T SAVE" + erro.Error())
+		}
 	case "fs-read-file":
 		s := strings.SplitAfterN(cmd, " ", 2)
-		f := fs.Open(s[1])
+		f, err := fs.Internal.OpenFile("/" + s[1], os.O_RDONLY)
+		if err != nil {
+			print("ERR on path:"+ "/" + s[1]+ err.Error())
+			break;
+		}
 		defer f.Close()
 		buf := make([]byte, 128)
 		for {
@@ -113,6 +121,28 @@ func ProcessCmd(cmdBuf []byte) {
 			machine.Serial.Write(buf[:n])
 		}
 		print(buf)
+	case "fs-ls":
+		// fs-ls [path]
+		s := strings.SplitAfterN(cmd, " ", 2)
+		dir,err := fs.Internal.Open(s[1])
+		if err != nil {
+			print("Could not open directory", s[1], err.Error())
+			return
+		}
+		defer dir.Close()
+		infos, err := dir.Readdir(0)
+		_ = infos
+		if err != nil {
+			print("Could not read directory %s: %v\n", s[1], err)
+			return
+		}
+		for _, info := range infos {
+			s := "-rwxrwxrwx"
+			if info.IsDir() {
+				s = "drwxrwxrwx"
+			}
+			print("%s %5d %s\n", s, info.Size(), info.Name())
+		}
 	default:
 		println("Unknown command: ", cmdFirst)
 	}
