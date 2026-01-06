@@ -51,6 +51,8 @@ func ProcessCmd(cmdBuf []byte) {
 	cmd := string(cmdBuf)
 	cmdFirst := strings.SplitAfterN(cmd, " ", 2)[0]
 	cmdFirst = strings.Trim(cmdFirst, " ")
+	
+	
 	//print(cmdFirst)
 	switch cmdFirst {
 	case "hi":
@@ -76,12 +78,6 @@ func ProcessCmd(cmdBuf []byte) {
 		sysfuncs.TurnLEDOn()
 	case "off":
 		sysfuncs.TurnLEDOff()
-	case "fs-init":
-		sysfuncs.InitFS()
-	case "fs-test-file-create":
-		sysfuncs.WriteTestFile()
-	case "fs-test-file-read":
-		sysfuncs.ReadTestFile()
 
 	case "fs-write-file":
 		// fs-write-file [filePath] ...bufToWrite
@@ -93,6 +89,7 @@ func ProcessCmd(cmdBuf []byte) {
 		copy(buf, s[2])
 		_, err := f.Write(buf)
 		if err != nil {
+			
 			print(err)
 		}
 		print("Successfully written file ", s[1], " with contents ", s[2])
@@ -101,6 +98,7 @@ func ProcessCmd(cmdBuf []byte) {
 			panic("DIDN'T SAVE" + erro.Error())
 		}
 	case "fs-read-file":
+		// fs-read-file [filePath]
 		s := strings.SplitAfterN(cmd, " ", 2)
 		f, err := fs.Internal.OpenFile("/" + s[1], os.O_RDONLY)
 		if err != nil {
@@ -113,14 +111,14 @@ func ProcessCmd(cmdBuf []byte) {
 			n, err := f.Read(buf)
 			if err != nil {
 				if err == io.EOF {
-					print("eOF")
+					//print("eOF")
 					break
 				}
 				panic(err)
 			}
 			machine.Serial.Write(buf[:n])
 		}
-		print(buf)
+		//print(buf)
 	case "fs-ls":
 		// fs-ls [path]
 		s := strings.SplitAfterN(cmd, " ", 2)
@@ -141,7 +139,7 @@ func ProcessCmd(cmdBuf []byte) {
 			if info.IsDir() {
 				s = "drwxrwxrwx"
 			}
-			print("%s %5d %s\n", s, info.Size(), info.Name())
+			print(info.Name(), " ", info.Size(), s, "\n")
 		}
 	default:
 		println("Unknown command: ", cmdFirst)
