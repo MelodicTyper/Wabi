@@ -17,23 +17,33 @@ import (
 
 func HandleCmdPrompt(inputBuffer []byte) []byte {
 	data, err := machine.Serial.ReadByte()
-
+	
 	if err == nil {
 		if data == '\r' || data == '\n' {
 			if len(inputBuffer) > 0 {
 				print("\r\n")
 				ProcessCmd(inputBuffer)
-				inputBuffer = inputBuffer[:0] // reset buffer
+				inputBuffer = inputBuffer[:0]
 			}
 			print("\r\n> ")
 			return inputBuffer
 		}
-
-		machine.Serial.WriteByte(data) // return characters to screen
-
+		if data == '\b' || data == '\x7f' {
+			if(len(inputBuffer) > 0) {
+				inputBuffer = inputBuffer[:len(inputBuffer)-1]
+				machine.Serial.Write([]byte{0x08, 0x20, 0x08})
+			}
+			//print(inputBuffer)
+			return inputBuffer
+		}
+		//print("adding chars")
 		if len(inputBuffer) < cap(inputBuffer) {
 			inputBuffer = append(inputBuffer, data)
 		}
+		//print("added")
+		machine.Serial.WriteByte(data) // return characters to screen
+
+		
 	}
 	return inputBuffer
 }
