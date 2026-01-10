@@ -3,14 +3,14 @@ package cmd
 import (
 	//"bytes"
 	//"fmt"
-	//"bytes"
+	"bytes"
 	"machine"
-	"os"
+	//"os"
 	"runtime"
 
 	//"bytes"
-	"io"
-	"strings"
+	//"io"
+	//"strings"
 
 	"github.com/MelodicTyper/wabi/sysfuncs"
 )
@@ -53,10 +53,44 @@ var m runtime.MemStats
 var fs *sysfuncs.Filesystem
 
 func SetFS(f *sysfuncs.Filesystem) {
-	fs = f
+	fs = f // TODO rework this to be cleaner
+}
+
+type Command struct {
+	Name []byte
+	Func func()
+}
+
+var commands = []Command{
+	{[]byte("on"), sysfuncs.TurnLEDOn},
+	{[]byte("off"), sysfuncs.TurnLEDOff},
 }
 
 func ProcessCmd(cmdBuf []byte) {
+	
+	// Get first part of command
+	// Interpret based on first word,
+	// Create args
+	// 
+	
+	cmdInput, rest, _ := bytes.Cut(cmdBuf, []byte(" "))
+	
+	var args [10][]byte;
+	
+	argsNum := createArgs(args[:], rest)
+	
+	for _, cmd := range commands {
+		if bytes.Equal(cmd.Name, cmdInput) {
+			cmd.Func()
+			print(argsNum)
+		}
+	}
+	
+	
+	
+	
+ 	
+	/* 
 
 	cmd := string(cmdBuf)
 	cmdFirst := strings.SplitAfterN(cmd, " ", 2)[0]
@@ -154,5 +188,28 @@ func ProcessCmd(cmdBuf []byte) {
 	default:
 		println("Unknown command: ", cmdFirst)
 	}
+	*/
+}
 
+func createArgs (argsArray [][]byte, args []byte) int {
+	argCount := 0
+
+	if args != nil || !bytes.Equal(args, []byte("")) {
+		for argCount < len(argsArray) {
+			arg, rest, found := bytes.Cut(args, []byte(" "))
+			if len(arg) > 0 {
+				argsArray[argCount] = arg
+				argCount++
+			}
+			
+			if !found {
+				break
+			}
+			
+		
+			
+			args = rest
+		}
+	}
+	return argCount
 }

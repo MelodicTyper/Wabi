@@ -1,0 +1,2 @@
+- Rework cmd to work on []byte instead of strings
+- Finish FS implementation
