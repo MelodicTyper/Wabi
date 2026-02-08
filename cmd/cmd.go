@@ -6,13 +6,13 @@ import (
 	"bytes"
 	"machine"
 	//"os"
-	"runtime"
+	//"runtime"
 
 	//"bytes"
 	//"io"
 	//"strings"
 
-	"github.com/MelodicTyper/wabi/sysfuncs"
+	//"github.com/MelodicTyper/wabi/sysfuncs"
 )
 
 func HandleCmdPrompt(inputBuffer []byte) []byte {
@@ -31,7 +31,7 @@ func HandleCmdPrompt(inputBuffer []byte) []byte {
 		if data == '\b' || data == '\x7f' {
 			if(len(inputBuffer) > 0) {
 				inputBuffer = inputBuffer[:len(inputBuffer)-1]
-				machine.Serial.Write([]byte{0x08, 0x20, 0x08})
+				machine.Serial.Write([]byte{0x08, 0x20, 0x08}) // TODO: check windows and mac compatability
 			}
 			//print(inputBuffer)
 			return inputBuffer
@@ -48,23 +48,21 @@ func HandleCmdPrompt(inputBuffer []byte) []byte {
 	return inputBuffer
 }
 
-var m runtime.MemStats
 
-var fs *sysfuncs.Filesystem
-
-func SetFS(f *sysfuncs.Filesystem) {
-	fs = f // TODO rework this to be cleaner
-}
 
 type Command struct {
 	Name []byte
-	Func func()
+	Func func([][]byte)
 }
 
 var commands = []Command{
-	{[]byte("on"), sysfuncs.TurnLEDOn},
-	{[]byte("off"), sysfuncs.TurnLEDOff},
+	{[]byte("on"), setLedOn},
+	{[]byte("off"), setLedOff},
+	{[]byte("hi"), hi},
 }
+
+var args [10][]byte;
+var sep = []byte(" ");
 
 func ProcessCmd(cmdBuf []byte) {
 	
@@ -72,18 +70,27 @@ func ProcessCmd(cmdBuf []byte) {
 	// Interpret based on first word,
 	// Create args
 	// 
+	cmdBuf = bytes.Trim(cmdBuf, " ");
+	cmdInput, rest, _ := bytes.Cut(cmdBuf, sep)
 	
-	cmdInput, rest, _ := bytes.Cut(cmdBuf, []byte(" "))
 	
-	var args [10][]byte;
-	
+	for i := range args {
+    	args[i] = args[i][:0]
+	}
 	argsNum := createArgs(args[:], rest)
+	print(rest)
+	found := false
 	
 	for _, cmd := range commands {
 		if bytes.Equal(cmd.Name, cmdInput) {
-			cmd.Func()
+			cmd.Func(args[:])
 			print(argsNum)
+			found = true
+			break
 		}
+	}
+	if !found {
+		print("Unknown command!")
 	}
 	
 	
@@ -191,25 +198,3 @@ func ProcessCmd(cmdBuf []byte) {
 	*/
 }
 
-func createArgs (argsArray [][]byte, args []byte) int {
-	argCount := 0
-
-	if args != nil || !bytes.Equal(args, []byte("")) {
-		for argCount < len(argsArray) {
-			arg, rest, found := bytes.Cut(args, []byte(" "))
-			if len(arg) > 0 {
-				argsArray[argCount] = arg
-				argCount++
-			}
-			
-			if !found {
-				break
-			}
-			
-		
-			
-			args = rest
-		}
-	}
-	return argCount
-}
